@@ -169,8 +169,43 @@
       <div class="server-row-players"></div>
       <div class="server-row-ping"></div>
       <button class="server-row-connect">ПОДКЛЮЧИТЬСЯ</button>
+      <button class="server-row-remove" title="Удалить сервер">&#10005;</button>
     </div>
   </template>
+
+  <!-- ========================================================================
+       МОДАЛКА «ДОБАВИТЬ СЕРВЕР»
+       Отдельная форма вместо window.prompt() — в Electron нативные
+       prompt()/alert() ненадёжны (могут не показываться при включённой
+       изоляции контекста или появляться за окном приложения).
+       ======================================================================== -->
+  <div class="modal-overlay" id="add-server-overlay" hidden>
+    <div class="modal-card">
+      <h2 class="modal-title">Добавить сервер</h2>
+
+      <div class="field-group">
+        <label class="field-label">Название</label>
+        <input class="field-input" id="add-server-name" type="text" spellcheck="false" placeholder="BLOOD S/I WORLD | Hard SI">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">IP-адрес</label>
+        <input class="field-input" id="add-server-ip" type="text" spellcheck="false" placeholder="127.0.0.1">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Порт</label>
+        <input class="field-input" id="add-server-port" type="text" spellcheck="false" placeholder="27015" value="27015">
+      </div>
+
+      <div class="field-hint" id="add-server-error" hidden></div>
+
+      <div class="wizard-actions">
+        <button class="btn" id="add-server-cancel">Отмена</button>
+        <button class="btn btn-primary" id="add-server-submit">Добавить</button>
+      </div>
+    </div>
+  </div>
 
   <script src="pages/servers.js"></script>
   <script src="pages/mods.js"></script>
