@@ -22,6 +22,7 @@
   "build": {
     "appId": "com.bsiw.launcher",
     "productName": "BLOOD S/I WORLD Launcher",
+    "publish": null,
     "directories": {
       "output": "dist"
     },
