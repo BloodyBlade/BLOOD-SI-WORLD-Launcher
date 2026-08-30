@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src *;">
+<title>BLOOD S/I WORLD Launcher</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Кастомный титлбар: своя рамка окна выдержана в общей стилистике -->
+  <header class="titlebar">
+    <div class="titlebar-drag">
+      <span class="titlebar-stripe" aria-hidden="true"></span>
+      <span class="titlebar-title">BLOOD S<span class="titlebar-slash">/</span>I WORLD <span class="titlebar-sub">// LAUNCHER</span></span>
+    </div>
+    <div class="titlebar-controls">
+      <button id="btn-min" class="titlebar-btn" title="Свернуть">&#x2013;</button>
+      <button id="btn-close" class="titlebar-btn titlebar-btn-close" title="Закрыть">&#x2715;</button>
+    </div>
+  </header>
+
+  <div class="app-shell">
+
+    <!-- Левая панель навигации -->
+    <nav class="sidebar">
+
+      <!-- Карточка игрока: аватар-монограмма + редактируемый никнейм -->
+      <div class="player-card" id="player-card">
+        <span class="player-avatar">BS<span class="player-avatar-slash">/</span>IW</span>
+        <div class="player-card-main">
+          <div class="player-card-label">Игрок</div>
+          <input
+            id="player-nickname"
+            class="player-nickname-input"
+            type="text"
+            maxlength="32"
+            spellcheck="false"
+            placeholder="Введите никнейм"
+          >
+        </div>
+        <button class="player-card-edit" id="player-card-edit" title="Изменить никнейм">&#9998;</button>
+      </div>
+
+      <button class="nav-item is-active" data-page="servers">
+        <span class="nav-icon">&#9635;</span> Серверы
+      </button>
+      <button class="nav-item" data-page="mods">
+        <span class="nav-icon">&#8635;</span> Моды
+      </button>
+      <button class="nav-item" data-page="workshop">
+        <span class="nav-icon">&#9660;</span> Установка модов
+      </button>
+      <button class="nav-item" data-page="news">
+        <span class="nav-icon">&#9873;</span> Новости
+      </button>
+      <button class="nav-item" data-page="settings">
+        <span class="nav-icon">&#9881;</span> Настройки
+      </button>
+
+      <div class="sidebar-footer">
+        <div class="mod-status" id="sidebar-mod-status">
+          <span class="dot dot-unknown" id="sidebar-mod-dot"></span>
+          <span id="sidebar-mod-text">Проверка модов…</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Основная область контента -->
+    <main class="content" id="content">
+      <!-- сюда рендерятся страницы (servers / mods / news / settings) -->
+    </main>
+
+  </div>
+
+  <!-- Нижняя панель запуска — всегда на виду, как в большинстве лаунчеров -->
+  <footer class="play-bar">
+    <div class="play-bar-info">
+      <div class="play-bar-server" id="play-bar-server">Сервер не выбран</div>
+      <input
+        id="launch-options"
+        class="play-bar-options"
+        type="text"
+        spellcheck="false"
+        placeholder="-novid -high +параметры запуска"
+      >
+    </div>
+    <button id="btn-play" class="play-button">
+      <span class="play-button-label">ИГРАТЬ</span>
+    </button>
+  </footer>
+
+  <!-- ========================================================================
+       МАСТЕР УСТАНОВКИ (первый запуск)
+       Показывается поверх всего, пока setupCompleted === false.
+       ======================================================================== -->
+  <div class="wizard-overlay" id="wizard-overlay" hidden>
+    <div class="wizard-card">
+
+      <div class="wizard-stripe"></div>
+
+      <!-- Шаг 1 — приветствие -->
+      <section class="wizard-step is-active" data-step="welcome">
+        <div class="wizard-logo">BLOOD S<span class="wizard-logo-slash">/</span>I WORLD</div>
+        <h2 class="wizard-title">Мастер установки</h2>
+        <p class="wizard-text">
+          Сейчас найдём папку с игрой, зададим ваш никнейм — и лаунчер готов к работе.
+          Это займёт меньше минуты.
+        </p>
+        <div class="wizard-actions">
+          <button class="btn btn-primary wizard-next" data-goto="gamepath">Начать</button>
+        </div>
+      </section>
+
+      <!-- Шаг 2 — путь к игре -->
+      <section class="wizard-step" data-step="gamepath">
+        <h2 class="wizard-title">Где установлена игра?</h2>
+        <p class="wizard-text">Укажите <code>left4dead2.exe</code> — лаунчер запомнит путь и подставит его при запуске.</p>
+
+        <div class="field-group">
+          <div class="field-row">
+            <input class="field-input" id="wizard-game-path" type="text" readonly placeholder="Путь не выбран">
+            <button class="btn" id="wizard-btn-browse">Обзор…</button>
+          </div>
+          <div class="field-hint" id="wizard-gamepath-hint">Ищем автоматически по стандартным путям Steam…</div>
+        </div>
+
+        <div class="wizard-actions">
+          <button class="btn" id="wizard-btn-autodetect">Найти автоматически</button>
+          <button class="btn btn-primary wizard-next" data-goto="nickname">Далее</button>
+        </div>
+      </section>
+
+      <!-- Шаг 3 — никнейм -->
+      <section class="wizard-step" data-step="nickname">
+        <h2 class="wizard-title">Как вас называть?</h2>
+        <p class="wizard-text">Это имя увидят другие игроки на сервере. Можно сменить позже в любой момент.</p>
+
+        <div class="field-group">
+          <input class="field-input" id="wizard-nickname" type="text" maxlength="32" spellcheck="false">
+        </div>
+
+        <div class="wizard-actions">
+          <button class="btn btn-primary wizard-next" data-goto="done">Далее</button>
+        </div>
+      </section>
+
+      <!-- Шаг 4 — готово -->
+      <section class="wizard-step" data-step="done">
+        <h2 class="wizard-title">Всё готово</h2>
+        <p class="wizard-text" id="wizard-summary">—</p>
+        <div class="wizard-actions">
+          <button class="btn btn-primary" id="wizard-btn-finish">Начать играть</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <template id="tpl-server-row">
+    <div class="server-row">
+      <span class="dot dot-unknown"></span>
+      <div class="server-row-main">
+        <div class="server-row-name"></div>
+        <div class="server-row-map"></div>
+      </div>
+      <div class="server-row-players"></div>
+      <div class="server-row-ping"></div>
+      <button class="server-row-connect">ПОДКЛЮЧИТЬСЯ</button>
+    </div>
+  </template>
+
+  <script src="pages/servers.js"></script>
+  <script src="pages/mods.js"></script>
+  <script src="pages/workshop.js"></script>
+  <script src="pages/news.js"></script>
+  <script src="pages/settings.js"></script>
+  <script src="wizard.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

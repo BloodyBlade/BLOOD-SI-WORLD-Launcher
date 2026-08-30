@@ -1,0 +1,20 @@
+{
+  "version": "2026.08.30",
+  "files": [
+    {
+      "path": "left4dead2/addons/sourcemod/plugins/l4d2_BloodTanks.smx",
+      "url": "https://example.com/bsiw-world/files/l4d2_BloodTanks.smx",
+      "sha256": "REPLACE_WITH_REAL_SHA256"
+    },
+    {
+      "path": "left4dead2/addons/sourcemod/plugins/l4d_ai_hardsi_merged.smx",
+      "url": "https://example.com/bsiw-world/files/l4d_ai_hardsi_merged.smx",
+      "sha256": "REPLACE_WITH_REAL_SHA256"
+    },
+    {
+      "path": "left4dead2/addons/sourcemod/plugins/l4d2_coop_extra_slots.smx",
+      "url": "https://example.com/bsiw-world/files/l4d2_coop_extra_slots.smx",
+      "sha256": "REPLACE_WITH_REAL_SHA256"
+    }
+  ]
+}

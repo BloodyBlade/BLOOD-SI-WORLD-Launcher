@@ -1,0 +1,63 @@
+{
+  "name": "bsiw-launcher",
+  "productName": "BLOOD S/I WORLD Launcher",
+  "version": "1.0.0",
+  "description": "Кроссплатформенный лаунчер для кастомного L4D2-сервера BLOOD S/I WORLD: список серверов, никнейм игрока, автообновление модов/плагинов, запуск игры, новости проекта.",
+  "main": "main.js",
+  "author": "Deisel",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "extract-zip": "^2.0.1"
+  },
+  "build": {
+    "appId": "com.bsiw.launcher",
+    "productName": "BLOOD S/I WORLD Launcher",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "BLOOD S/I WORLD Launcher",
+      "artifactName": "setup.${ext}",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "license": "assets/license.txt",
+      "displayLanguageSelector": false
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.png"
+    }
+  }
+}
