@@ -44,7 +44,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "BLOOD S/I WORLD Launcher",
-      "artifactName": "setup.${ext}",
+      "artifactName": "BSIW-Setup.${ext}",
       "installerIcon": "assets/icon.ico",
       "uninstallerIcon": "assets/icon.ico",
       "installerHeaderIcon": "assets/icon.ico",
