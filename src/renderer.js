@@ -16,6 +16,7 @@ window.AppState = (() => {
   async function launch() {
     const playBtn = document.getElementById('btn-play');
     const optionsInput = document.getElementById('launch-options');
+    const statusEl = document.getElementById('play-bar-status');
 
     // Кастомные параметры из play-bar перекрывают дефолт из настроек на
     // время этого запуска.
@@ -23,19 +24,49 @@ window.AppState = (() => {
       await window.api.config.set({ launchOptions: optionsInput.value.trim() });
     }
 
+    statusEl.hidden = true;
     playBtn.disabled = true;
     playBtn.querySelector('.play-button-label').textContent = 'ЗАПУСК…';
 
     try {
-      await window.api.game.launch(
+      const result = await window.api.game.launch(
         selectedServer ? { connectIp: selectedServer.ip, connectPort: selectedServer.port } : {}
       );
+
+      if (!result || !result.ok) {
+        showStatus(
+          statusEl,
+          `Не удалось запустить игру: ${result?.error || 'неизвестная ошибка'}. ` +
+          'Проверьте путь к left4dead2.exe во вкладке «Настройки».',
+          true
+        );
+      } else if (result.mode === 'steam') {
+        showStatus(
+          statusEl,
+          'Путь к игре не задан — запуск идёт через Steam. ' +
+          'Если ничего не открылось, убедитесь, что Steam запущен и игра установлена, ' +
+          'либо укажите путь к left4dead2.exe в «Настройках» для прямого запуска.',
+          false
+        );
+      }
+      // result.mode === 'exe' и ok:true — процесс успешно стартовал, статус не показываем.
+      // Учтите: у Source-движка первая загрузка (сборка кэша шейдеров) может
+      // занимать до минуты — это не зависание лаунчера, окно игры просто
+      // появится не сразу.
+    } catch (err) {
+      showStatus(statusEl, `Ошибка запуска: ${String(err.message || err)}`, true);
     } finally {
       setTimeout(() => {
         playBtn.disabled = false;
         playBtn.querySelector('.play-button-label').textContent = 'ИГРАТЬ';
       }, 1500);
     }
+  }
+
+  function showStatus(el, text, isError) {
+    el.textContent = text;
+    el.classList.toggle('is-error', Boolean(isError));
+    el.hidden = false;
   }
 
   return { selectServer, launch, get selectedServer() { return selectedServer; } };
