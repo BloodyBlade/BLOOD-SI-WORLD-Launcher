@@ -80,6 +80,12 @@ window.Wizard = (() => {
       if (nicknameInput) nicknameInput.value = finalNickname;
 
       overlay.hidden = true;
+
+      // Кнопка называется «Начать играть» — значит должна реально запускать
+      // игру, а не просто закрывать мастер. window.AppState объявлен в
+      // renderer.js, который к моменту клика (после того как пользователь
+      // прошёл все шаги мастера) уже точно выполнился.
+      if (window.AppState) window.AppState.launch();
     });
 
     // Автопоиск запускаем сразу, чтобы к моменту, когда пользователь дойдёт
