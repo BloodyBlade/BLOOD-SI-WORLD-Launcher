@@ -1,0 +1,57 @@
+name: Build Windows installer
+
+# Запускается:
+#  - вручную, кнопкой "Run workflow" во вкладке Actions на GitHub;
+#  - автоматически при пуше тега вида v1.0.0 (тогда ещё и публикует Release
+#    с готовым .exe);
+#  - при пуше/PR в main — просто чтобы сразу видеть, что сборка не сломалась.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Windows installer (NSIS)
+        run: npm run dist:win
+
+      # electron-builder кладёт итоговый .exe и вспомогательные файлы в dist/.
+      # Публикуем только сам установщик и его контрольную сумму, без "рыхлых"
+      # промежуточных файлов (папка win-unpacked и т.п.).
+      - name: Upload installer as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsiw-launcher-setup
+          path: |
+            dist/*.exe
+            dist/*.exe.blockmap
+          if-no-files-found: error
+
+      # Если сборка запущена пушем тега (v1.0.0, v1.2.3 и т.п.) — дополнительно
+      # публикуем установщик как файл в GitHub Release с этим тегом.
+      - name: Publish to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.exe
+            dist/*.exe.blockmap
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
