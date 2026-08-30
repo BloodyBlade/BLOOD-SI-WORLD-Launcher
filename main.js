@@ -212,17 +212,31 @@ ipcMain.handle('game:launch', async (_evt, { connectIp, connectPort } = {}) => {
   }
 
   if (gamePath && fs.existsSync(gamePath)) {
-    try {
-      const child = spawn(gamePath, args, {
-        cwd: path.dirname(gamePath),
-        detached: true,
-        stdio: 'ignore'
+    // spawn() не бросает исключение синхронно при неудаче (файл заблокирован
+    // антивирусом, нет прав на исполнение и т.п.) — ошибка прилетает
+    // асинхронно через событие 'error'. Ждём либо успешный старт процесса,
+    // либо эту ошибку, чтобы кнопка «Играть» не зависала молча.
+    return new Promise((resolve) => {
+      let child;
+      try {
+        child = spawn(gamePath, args, {
+          cwd: path.dirname(gamePath),
+          detached: true,
+          stdio: 'ignore'
+        });
+      } catch (err) {
+        resolve({ ok: false, error: String(err.message || err) });
+        return;
+      }
+
+      child.once('error', (err) => {
+        resolve({ ok: false, error: String(err.message || err) });
       });
-      child.unref();
-      return { ok: true, mode: 'exe' };
-    } catch (err) {
-      return { ok: false, error: String(err) };
-    }
+      child.once('spawn', () => {
+        child.unref();
+        resolve({ ok: true, mode: 'exe' });
+      });
+    });
   }
 
   // Фолбэк: steam://run/550//<args>
@@ -233,8 +247,12 @@ ipcMain.handle('game:launch', async (_evt, { connectIp, connectPort } = {}) => {
     .join(' ');
   const steamArgs = encodeURIComponent(steamArgString);
   const steamUrl = `steam://run/550//${steamArgs}`;
-  await shell.openExternal(steamUrl);
-  return { ok: true, mode: 'steam' };
+  try {
+    await shell.openExternal(steamUrl);
+    return { ok: true, mode: 'steam' };
+  } catch (err) {
+    return { ok: false, error: String(err.message || err) };
+  }
 });
 
 // ---------------------------------------------------------------------------
