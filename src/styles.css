@@ -696,6 +696,15 @@ button, input {
 
 .play-bar-options:focus { outline: none; border-color: var(--hazard-dim); }
 
+.play-bar-status {
+  margin-top: 6px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--hazard);
+}
+
+.play-bar-status.is-error { color: var(--blood-bright); }
+
 .play-button {
   flex-shrink: 0;
   width: 168px;
